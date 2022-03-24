@@ -34,7 +34,7 @@ def readChessboard(frame):
 
         print('Camera distortion calculated.')
         return True, gray
-    print('Chessboard not found.')
+
     return False, gray
 
 def undistort(frame, gray):
@@ -50,16 +50,15 @@ def undistort(frame, gray):
 distortionKnown = False
 while True:
     ret, frame = cap.read()
-    if ret:
-
-        if cv.waitKey(10) == ord('t'):
-            distortionKnown, gray = readChessboard(frame)
+    if ret:            
 
         if cv.waitKey(10) == ord('q'):
             break
 
         if distortionKnown:
             frame = undistort(frame, gray)
+        else:
+            distortionKnown, gray = readChessboard(frame)
 
         cv.imshow('webcam', frame)
         
