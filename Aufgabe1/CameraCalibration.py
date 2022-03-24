@@ -1,3 +1,4 @@
+from cgi import test
 import numpy as np
 import cv2 as cv
 
@@ -18,19 +19,23 @@ def showLiveImage():
         print('Camera not found.')
 
 def captureFrame():
+    while True:
         ret, current_frame = cap.read()
-        return ret, current_frame    
+        if ret:
+            print('Test frame captured.')
+            return current_frame    
 
 test_frames = []
 while True:
-    
     if cv.waitKey(10) == ord('q'):
         break
     if cv.waitKey(10) == ord('c'):
-        frame_captured, test_frame = captureFrame()
-        if frame_captured:
-            test_frames.append(test_frame)
-
+        test_frames.append(captureFrame())
+    if cv.waitKey(10) == ord('s'):
+        i = 0
+        for ts in test_frames:
+            cv.imshow('test frame ' + str(i), ts)
+            i = i+1
     showLiveImage()
 
 cap.release()
