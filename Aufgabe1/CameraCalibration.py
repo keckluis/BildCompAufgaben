@@ -17,10 +17,23 @@ def showLiveImage():
     else:
         print('Camera not found.')
 
+def captureFrames():
+    capture_frames = []
+    for i in range(15):
+        print('Reading frame ' + str(i))
+        ret, current_frame = cap.read()
+        if ret: 
+            capture_frames.append(current_frame)
+            cv.imshow('test' + str(i), current_frame)
+    return capture_frames
+
 while True:
     
     if cv.waitKey(10) == ord('q'):
         break
+    if cv.waitKey(10) == ord('c'):
+        frames = captureFrames()
+
     showLiveImage()
 
 cap.release()
