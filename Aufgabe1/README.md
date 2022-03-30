@@ -3,8 +3,7 @@
 Ziel dieses Projekts ist es die Verzerrung einer Kamera zu ermitteln um diese anschließend auszugleichen und ein unverzerrtes Bild zu erhalten.
 Dazu soll ein Set von Kalibrationsbildern dienen, dass Nutzer für ihre Kamera mit diesem Programm aufnehmen können. Mit diesen Kalibrationsbilder wird die Verzerrung der Kamera ermittelt und kann in Echtzeit aus einem Live-Bild dieser Kamera entfernt werden.
 
-Grundlage für dieses Projekt bildet die OpenCV-Dokumentation zum Thema Kamera-Kalibration:
-https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html
+Grundlage für dieses Projekt bildet die OpenCV-Dokumentation zum Thema [Kamera-Kalibration](https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html).
 
 ## Workflow
 ### CaptureCalibrationImages.py
