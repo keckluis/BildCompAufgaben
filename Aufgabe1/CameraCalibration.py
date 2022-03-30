@@ -1,61 +1,38 @@
-from doctest import testfile
 import numpy as np
 import cv2 as cv
-import glob
 
 #code based on OpenCV documentation: https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html
 
 cap = cv.VideoCapture(0)
 
-#two windows for comparison
-cv.namedWindow('webcam original',  cv.WINDOW_FREERATIO)
-cv.namedWindow('webcam undistorted',  cv.WINDOW_FREERATIO)
-    
-#get all images from folder
-file_names = [img for img in glob.glob('Aufgabe1/CalibrationImages/*.png')]
-
-#display number of found images, give warning for low number and quit program in case there aren't any
-cb_images_count = len(file_names)
-if  cb_images_count > 0:
-    print('Found ' + str(cb_images_count) + ' calibration images.')
-    if cb_images_count < 10:
-        print('WARNING: At least 10 images are recommended for camera calibration.')
-    print('Press Q to close the window.')   
-else:
-    print("No calibration image found. Please capture them with 'CaptureCalibrationImages.py' first.")
-    cap.release()
-    cv.destroyAllWindows()
-    quit()
-
-#read images and convert them to needed color space
-calibration_images = []
-for img in file_names:
-    cb_img = cv.imread(img)
-    cb_img = cv.cvtColor(cb_img, cv.COLOR_BGR2GRAY)
-    calibration_images.append(cb_img)
+#window names
+window_original = 'webcam original'
+window_undistorted = 'webcam undistorted'
 
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
-#calculate camera distortion
-obj_points = []
-img_points = []
+#get file with calibration data
+file_name = input('Please enter the name of your calibration file >')
+calibration_data = np.load('Aufgabe1/' + file_name + '.npz')
+obj_points = calibration_data['obj_points']
+img_points = calibration_data['img_points']
 
-obj_p = np.zeros((6*7,3), np.float32)
-obj_p[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
+#quit if file is not usable
+cal_images = len(obj_points)
+if cal_images == 0:
+    print('Invalid calibration data. Please try a different file.')
+    cap.release()
+    cv.destroyAllWindows()
+    quit()
+else:
+    print('Found data of ' + str(cal_images) + ' calibration images.')
 
-for cb_img in calibration_images:
-    ret, corners = cv.findChessboardCorners(cb_img, (7, 6), None)
-    if ret:
-        img_points.append(obj_p)
-        img_points.append(corners)
 
-# calibration_images = np.load('Aufgabe1/CalibrationArrays.npz')
-# obj_points = calibration_images['obj_points']
-# img_points = calibration_images['img_points']
+ref_img = cv.imread('Aufgabe1/ref_img.png')
+ref_img = cv.cvtColor(ref_img, cv.COLOR_BGR2GRAY)
+ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, ref_img.shape[::-1], None, None)
 
-ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, calibration_images[0].shape[::-1], None, None)
-
-h, w = calibration_images[0].shape[:2]
+h, w = ref_img.shape[:2]
 new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
 
 #remove distortion of current frame
@@ -64,6 +41,10 @@ def removeDistortion(frame):
     x, y, w, h = roi
     frame = frame[y:y+h, x:x+w]
     return frame
+
+#two windows for comparison
+cv.namedWindow(window_original,  cv.WINDOW_FREERATIO)
+cv.namedWindow(window_undistorted,  cv.WINDOW_FREERATIO)
 
 #video loop
 while True:
@@ -78,8 +59,8 @@ while True:
         frame_undistorted = removeDistortion(frame)
 
         #show original and undistorted image for comparison
-        cv.imshow('webcam original', frame)
-        cv.imshow('webcam undistorted', frame_undistorted)
+        cv.imshow(window_original, frame)
+        cv.imshow(window_undistorted, frame_undistorted)
     else:
         print('Camera not found.')
 
