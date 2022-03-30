@@ -1,3 +1,4 @@
+from doctest import testfile
 import numpy as np
 import cv2 as cv
 import glob
@@ -33,22 +34,26 @@ for img in file_names:
     cb_img = cv.cvtColor(cb_img, cv.COLOR_BGR2GRAY)
     calibration_images.append(cb_img)
 
-#calculate camera distortion
-objpoints = []
-imgpoints = []
-
-objp = np.zeros((6*7,3), np.float32)
-objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
-
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+
+#calculate camera distortion
+obj_points = []
+img_points = []
+
+obj_p = np.zeros((6*7,3), np.float32)
+obj_p[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
 
 for cb_img in calibration_images:
     ret, corners = cv.findChessboardCorners(cb_img, (7, 6), None)
     if ret:
-        objpoints.append(objp)
-        imgpoints.append(corners)
+        img_points.append(obj_p)
+        img_points.append(corners)
 
-ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, calibration_images[0].shape[::-1], None, None)
+# calibration_images = np.load('Aufgabe1/CalibrationArrays.npz')
+# obj_points = calibration_images['obj_points']
+# img_points = calibration_images['img_points']
+
+ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, calibration_images[0].shape[::-1], None, None)
 
 h, w = calibration_images[0].shape[:2]
 new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
@@ -59,7 +64,7 @@ def removeDistortion(frame):
     x, y, w, h = roi
     frame = frame[y:y+h, x:x+w]
     return frame
-      
+
 #video loop
 while True:
     #quit
