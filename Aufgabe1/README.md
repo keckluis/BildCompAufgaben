@@ -1,18 +1,20 @@
 # Aufgabe 1
 ## Zweck des Projekts
-Ziel dieses Projekts ist es die Verzerrung einer Kamera zu ermitteln um diese anschließend auszugleichen und ein unverzerrtes Bild zu erhalten.\
+Ziel dieses Projekts ist es die Verzerrung einer Kamera zu ermitteln, um diese anschließend auszugleichen und ein unverzerrtes Bild zu erhalten.  
 Dazu soll ein Set von Kalibrationsbildern dienen, dass Nutzer für ihre Kamera mit diesem Programm aufnehmen können. Mit diesen Kalibrationsbilder wird die Verzerrung der Kamera ermittelt und kann in Echtzeit aus einem Live-Bild dieser Kamera entfernt werden.  
 
-Grundlage für dieses Projekt bildet die OpenCV-Dokumentation zum Thema [Kamera-Kalibration](https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html).  
+Grundlage für dieses Projekt bildet die OpenCV-Dokumentation zum Thema [Kamera-Kalibration](https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html). 
 
 ## Workflow
 ### CaptureCalibrationImages.py
 Um ein Set an Kalibrationsbildern für die eigene Kamera aufzunehmen wird zunächst das Skript 'CaptureCalibrationImages.py' ausgeführt. Ein Fenster öffnet sich, in dem das Live-Bild der Kamera angezeigt wird. 
-Mit der Taste 'C' wird der Aufnahmemodus gestartet. Nun wird pro Sekunde ein Bild aufgenommen. Für Kalibrationsbilder wird ein ausgedrucktes Schachbrettmuster (min. 8x8 Felder) in die Kamera gehalten. Dabei sollte die Position angepasst werden, sodass die Sammlung an aufgenommen Schachbrett-Bildern möglichst den ganzen Bildbereich abdeckt. Schnelle Bewegungen sollten vermieden werden, um Bewegungsunschärfe zu vermeiden. Mit erneutem drücken von 'C' wird der Aufnahmemodus beendet.  
-Nicht alle aufgenommen Bilder werden sich für die Kalibration eignen, da nicht immer das Schachbrettmuster erkannt wird. Um die ungeeignetet Bilder auszusortieren wird mit der Taste 'E' der Evaluationsmodus gestartet. Jedes aufgenommene Bild wird ausgewertet und die geeigneten werden in neuen Fenstern zur Betrachtung geöffnet. Sollte auffallen, dass darunter immer noch Bilder sind die aussortiert werden sollten, kann man sich den Namen des Fensters merken um diese Bilder später wieder zu löschen. OpenCV empfiehlt mindestens 10 Kalibrationsbilder für ein gutes Ergebnis. Ist diese Zahl noch nicht erreicht sollten zusätzliche Bilder aufgenommen und evaluiert werden.  
-Sind genug Kalibrationsbilder vorhanden kann das Programm mit der Taste 'Q' beendet werden. Die Kalibrationsbilder werden im Ordner 'CalibrationImages' gespeichert.  
+Mit der Taste 'C' wird der Aufnahmemodus gestartet. Nun wird pro Sekunde ein Bild aufgenommen. Für die Kalibrationsbilder wird ein ausgedrucktes Schachbrettmuster (min. 8x8 Felder) in die Kamera gehalten. Dabei sollte die Position angepasst werden, sodass die Sammlung an aufgenommen Schachbrett-Bildern möglichst den ganzen Bildbereich abdeckt. Schnelle Bewegungen sollten vermieden werden, um Bewegungsunschärfe zu vermeiden. Mit erneutem drücken von 'C' wird der Aufnahmemodus beendet.  
+Nicht alle aufgenommen Bilder werden sich für die Kalibration eignen, da nicht immer das Schachbrettmuster erkannt wird. Um die ungeeignetet Bilder auszusortieren wird mit der Taste 'E' der Evaluationsmodus gestartet. Jedes Bild wird zunächst darauf untersucht ob das Schachbrettmuster erkannt wird. Die geeigneten Bilder werden in einem eigenen Fenster nacheinander zur Evaluierung durch den Nutzer angezeigt. Das aktuell angezeigte Bild kann mit der Taste 'S' gespeichert werden oder mit 'D' gelöscht werden, wenn es nicht zur Kalibrierung genutzt werden soll. Nachdem über alle Bilder entschieden wurde kehrt das Programm in den Startmodus zurück und die aktuelle Anzahl an Kalibrationsbildern wird in der Konsole angezeigt.  
+Sollte die Anzahl an Kalibrierungsbildern nicht ausreichen (OpenCV empfiehlt mindestens 10 Bilder), kann der Aufnahmemodus erneut mit 'C' gestartet werden und die neuen Bilder können mit 'E' evaluiert werden um neue Kalibrationsbilder hinzuzufügen.  
+Sind genug Kalbrationsbilder vorhanden kann das Programm mit der Taste 'Q' beendet werden. In der Konsole wird der Nutzer aufgefordert einen Dateinamen für die ermittelten Kalibrationsdaten einzugeben. Die Angabe eines Dateiformats ist nicht nötig. Mit Eingabe des Dateinamens endet das Programm und die Daten werden für die weitere Benutzung gespeichert.
 
 ### CameraCalibration.py
-Mit den aufgenommenen Kalibrationsbildern kann nun das Kamerabild entzerrt werden. Dazu wird das Skript 'CameraCalibration.py' gestartet. Das Skript lädt die zuvor aufgenommenen Kalibrationsbilder und ermittelt anhand dieser die Verzerrung der Kamera.  
+Mit den aufgenommenen Kalibrationsdaten kann nun das Kamerabild entzerrt werden. Dazu wird das Skript 'CameraCalibration.py' gestartet.  
+In der Konsole wird nun nach dem Dateinamen für die Kalibrationsdaten gefragt. Dieser wird ohne Angabe eines Dateiformats eingegeben.  
 Zwei Fenster werden geöffnet. Das Fenster 'webcam original' zeigt das unveränderte Live-Bild der Kamera. 'webcam undistorted' zeigt ein Live-Bild bei dem für jeden Frame mit Hilfe der ermittelten Kameraverzerrung das Bild wieder entzerrt wurde.  
 Mit der Taste 'Q' lässt sich das Programm wieder beenden.   
