@@ -3,6 +3,13 @@ import numpy as np
 import time
 
 #code based on OpenCV documentation: https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html
+#code from documentation is marked with 'OpenCV'
+
+#user instructions
+print('Press Q to quit.')
+print('Press C to start/stop capturing mode.')
+print('Press E to evaluate captured images.')
+print('Data confirmed by evaluation will be saved on quit.')
 
 cap = cv.VideoCapture(0)
 
@@ -12,12 +19,7 @@ window_webcam = 'webcam'
 
 cv.namedWindow(window_webcam,  cv.WINDOW_FREERATIO)
 
-#user instructions
-print('Press Q to close the window.')
-print('Press C to start/stop capturing mode.')
-print('Press E to evaluate captured images.')
-print('Data confirmed by evaluation will be saved on quit.')
-
+#OpenCV: needed for displaying corners in calibration images
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 captured_images = []
@@ -37,7 +39,7 @@ def captureMode(captured_images):
         #reduced frame rate to allow repositioning of chessboard
         time.sleep(1)
 
-#finds usable calibration pictures and displays them
+#finds usable calibration images and displays them
 def evaluateImages(calibration_images, captured_images):    
     print('Evaluating captured images...')
     print('S: save image, D: delete image')
@@ -45,15 +47,16 @@ def evaluateImages(calibration_images, captured_images):
     cv.namedWindow(window_calibration, cv.WINDOW_FREERATIO)
 
     for img in captured_images:
-        #look for chessboard
+        #OpenCV: look for chessboard in image
         img_gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         found_cb, corners = cv.findChessboardCorners(img_gray, (7,6), None)
 
         if found_cb:
-            #show corners for manual verification
+            #OpenCV: show corners for manual verification
             corners2 = cv.cornerSubPix(img_gray, corners, (11,11), (-1,-1), criteria)
             cv.drawChessboardCorners(img, (7,6), corners2, ret)
             cv.imshow('calibration picture', img)
+
             #save confirmed calibration image to separate array
             while True:
                 key_press = cv.waitKey(10)
@@ -69,6 +72,7 @@ def evaluateImages(calibration_images, captured_images):
 
 #save calibration data as arrays
 def saveCalibrationData(calibration_images):
+    #OpenCV: calculate calibration data based on chosen images
     obj_points = []
     img_points = []
 
@@ -80,7 +84,9 @@ def saveCalibrationData(calibration_images):
         if ret:
             obj_points.append(obj_p)
             img_points.append(corners)
-    file_name = input('Please enter a file name for your calibration data >')
+    
+    #saves calibration data in file named by user input in console
+    file_name = input('Enter a file name for your calibration data (without format)>')
     np.savez('Aufgabe1/' + file_name + '.npz', obj_points=obj_points, img_points=img_points)
     if len(calibration_images) > 0: 
         cv.imwrite('Aufgabe1/ref_img.png', calibration_images[0])

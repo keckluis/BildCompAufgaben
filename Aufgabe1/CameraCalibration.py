@@ -2,6 +2,9 @@ import numpy as np
 import cv2 as cv
 
 #code based on OpenCV documentation: https://docs.opencv.org/4.5.5/dc/dbb/tutorial_py_calibration.html
+#code from documentation is marked with 'OpenCV'
+
+print('Press Q to quit.')
 
 cap = cv.VideoCapture(0)
 
@@ -12,32 +15,42 @@ window_undistorted = 'webcam undistorted'
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 
 #get file with calibration data
-file_name = input('Please enter the name of your calibration file >')
-calibration_data = np.load('Aufgabe1/' + file_name + '.npz')
+file_name = input('Enter the name of your calibration file (without format) >')
+
+#try to load file and ask for new input if not found
+while True:
+    try:
+        calibration_data = np.load('Aufgabe1/' + file_name + '.npz')
+        break
+    except:
+        file_name = input('File not found. Try again >')
+
 obj_points = calibration_data['obj_points']
 img_points = calibration_data['img_points']
 
 #quit if file is not usable
 cal_images = len(obj_points)
 if cal_images == 0:
-    print('Invalid calibration data. Please try a different file.')
+    print('Invalid calibration data. Try a different file.')
     cap.release()
     cv.destroyAllWindows()
     quit()
 else:
     print('Found data of ' + str(cal_images) + ' calibration images.')
 
-
 ref_img = cv.imread('Aufgabe1/ref_img.png')
 ref_img = cv.cvtColor(ref_img, cv.COLOR_BGR2GRAY)
-ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(obj_points, img_points, ref_img.shape[::-1], None, None)
 
+#OpenCV: calibrate camera based on calibration data
+ret, intrinsic_mtx, dist_coeffs, rotation_vecs, translation_vecs = cv.calibrateCamera(obj_points, img_points, ref_img.shape[::-1], None, None)
+
+#OpenCV: calculate new camera matrix to remove distortion of a frame
 h, w = ref_img.shape[:2]
-new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w, h), 1, (w, h))
+new_camera_matrix, roi = cv.getOptimalNewCameraMatrix(intrinsic_mtx, dist_coeffs, (w, h), 1, (w, h))
 
-#remove distortion of current frame
+#OpenCV: remove distortion of current frame
 def removeDistortion(frame):
-    frame = cv.undistort(frame, mtx, dist, None, new_camera_matrix)
+    frame = cv.undistort(frame, intrinsic_mtx, dist_coeffs, None, new_camera_matrix)
     x, y, w, h = roi
     frame = frame[y:y+h, x:x+w]
     return frame
@@ -63,6 +76,7 @@ while True:
         cv.imshow(window_undistorted, frame_undistorted)
     else:
         print('Camera not found.')
+        break
 
 cap.release()
 cv.destroyAllWindows()
