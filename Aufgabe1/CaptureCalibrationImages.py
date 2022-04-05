@@ -97,7 +97,7 @@ def saveCalibrationData(calibration_images):
     
     # saves calibration data in file named by user input in console
     file_name = input('Enter a file name for your calibration data (without format) >')
-    np.savez('Aufgabe1/' + file_name + '.npz', obj_points=obj_points, img_points=img_points)
+    np.savez(file_name + '.npz', obj_points=obj_points, img_points=img_points)
     
 # video loop
 while True:
@@ -124,6 +124,7 @@ while True:
         cv.imshow(window_webcam, frame)
     else:
         print('Camera not found.')
+        break
 
 cap.release()
 cv.destroyAllWindows()

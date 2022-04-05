@@ -19,7 +19,7 @@ file_name = input('Enter the name of your calibration file (without format) >')
 # try to load file and ask for new input if not found
 while True:
     try:
-        calibration_data = np.load('Aufgabe1/' + file_name + '.npz')
+        calibration_data = np.load(file_name + '.npz')
         break
     except:
         file_name = input('File not found. Try again >')
