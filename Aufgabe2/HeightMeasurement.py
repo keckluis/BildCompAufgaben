@@ -82,9 +82,11 @@ def calculateMugHeight():
     line4 = getLine(clicked_points[2], clicked_points[3])
     # intersection of vertical line on bottle and mug height at bottle position
     mug_top_on_bottle = getIntersection(line3, line4)
+
     # display mug height at bottle position
+    cv2.line(img, clicked_points[2], mug_top_on_bottle, (0,0,255), 5)
     cv2.circle(img, mug_top_on_bottle, 2, (0,255,255), 5)
-    
+
     # calculate the mug height at bottle position in pixels
     mug_height_px = getDistance(mug_top_on_bottle, clicked_points[2])
     # calculate the bottle height at bottle position in pixels
@@ -117,7 +119,7 @@ def click(event, x, y, flags, param):
             calculateVanishingPoints(0, 1, 2, 3, (255,0,0))
             # vanishing point 2
             calculateVanishingPoints(0, 3, 1, 2, (0,255,0))
-            
+
             markClickedPoints()
             emptyClickedPoints()
             print('Mark first the mug and then the bottle height (bottom to top).')
@@ -128,10 +130,12 @@ def click(event, x, y, flags, param):
 
             text_pos = (clicked_points[0][0], clicked_points[0][1] + 100)
             cv2.putText(img, mug_height, text_pos, cv2.FONT_HERSHEY_PLAIN, 5, (0,0,0), 6, cv2.LINE_8)
-            print('Mug height: ' + mug_height + 'cm')
+            print('Mug height: ' + mug_height)
+            cv2.setMouseCallback(window_name, lambda *args : None)
             print('Press Q to quit.')
 
-        markClickedPoints()
+        if len(clicked_points) <= 4:
+            markClickedPoints()
         cv2.imshow(window_name, img)
             
 cv2.setMouseCallback(window_name, click)
