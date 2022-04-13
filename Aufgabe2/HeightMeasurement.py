@@ -123,8 +123,7 @@ def expandImage():
     cv2.circle(world_img, vanishing_point1, 10, (0, 255, 255), -1)
     cv2.circle(world_img, vanishing_point2, 10, (0, 255, 255), -1)
     cv2.circle(world_img, vanishing_point3, 10, (0, 255, 255), -1)
-    
-    cv2.imshow(window_name, world_img)
+    return world_img
 
 # mark clicked points on top
 def markClickedPoints():
@@ -157,12 +156,10 @@ def click(event, x, y, flags, param):
             cv2.putText(img, mug_height, text_pos, cv2.FONT_HERSHEY_PLAIN, 5, (0, 0, 0), 6, cv2.LINE_8)
             print('Mug height: ' + mug_height)
 
-            # stop mouse input
-            cv2.setMouseCallback(window_name, lambda *args : None)
+            expanded_img = expandImage()
+            cv2.imshow(window_name, expanded_img)
 
-            expandImage()
-
-            cv2.imwrite('Aufgabe2/result.jpg', img)
+            cv2.imwrite('Aufgabe2/result.jpg', expanded_img)
             print('Press Q to quit.')
 
         if len(clicked_points) <= 8:
