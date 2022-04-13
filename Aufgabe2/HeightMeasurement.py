@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import operator
 
 # user instruction
 print('Mark the table corners clockwise or counter-clockwise.')
@@ -8,6 +9,7 @@ window = cv2.namedWindow(window_name, cv2.WINDOW_FREERATIO)
 
 # load the image
 img = cv2.imread('Aufgabe2/table_bottle_01.jpg', cv2.IMREAD_COLOR)
+orig_img = img.copy()
 cv2.imshow(window_name, img)
 height, width, _ = img.shape
 
@@ -51,15 +53,15 @@ def calculateVanishingPoints(a, b, c, d, color):
     cv2.line(img, clicked_points[c], clicked_points[d], color, 3) 
 
     # draw a circle at intersection position
-    cv2.circle(img, intersec_pos, 10, (0,0,255), 3)
+    cv2.circle(img, intersec_pos, 10, (0, 0, 255), 3)
 
     # get the points of the 2 lines that are closer to the intersection point
     closer_point1 = getCloserPoint(intersec_pos, clicked_points[a], clicked_points[b])
     closer_point2 = getCloserPoint(intersec_pos, clicked_points[c], clicked_points[d])
 
     # draw red lines from the given lines to their vanishing point
-    cv2.line(img, closer_point1, intersec_pos, (0,0,255), 3)
-    cv2.line(img, closer_point2, intersec_pos, (0,0,255), 3)
+    # cv2.line(img, closer_point1, intersec_pos, (0, 0, 255), 3)
+    # cv2.line(img, closer_point2, intersec_pos, (0, 0, 255), 3)
 
     # add vanishing point in array to monitor progress
     vanishing_points.append(intersec_pos)
@@ -69,41 +71,65 @@ def calculateVanishingPoints(a, b, c, d, color):
 def calculateMugHeight():
     # calculate intersection between vanishing line and line through bottom of mug and bottle
     line1 = getLine(vanishing_points[0], vanishing_points[1])
-    line2 = getLine(clicked_points[0], clicked_points[2])
+    line2 = getLine(clicked_points[4], clicked_points[6])
     intersec_pos = getIntersection(line1, line2)
+    vanishing_points.append(intersec_pos)
 
     # draw lines from vanishing line to object bottoms and mug top
-    cv2.line(img, clicked_points[0], intersec_pos, (255,255,255), 3)
-    cv2.line(img, intersec_pos, clicked_points[1], (255,255,255), 3)
+    # cv2.line(img, clicked_points[4], intersec_pos, (255, 255, 255), 3)
+    # cv2.line(img, intersec_pos, clicked_points[5], (255, 255, 255), 3)
 
     # line from vanishing line through mug top
-    line3 = getLine(intersec_pos, clicked_points[1])
+    line3 = getLine(intersec_pos, clicked_points[5])
     # line from bottle bottom to top
-    line4 = getLine(clicked_points[2], clicked_points[3])
+    line4 = getLine(clicked_points[6], clicked_points[7])
     # intersection of vertical line on bottle and mug height at bottle position
     mug_top_on_bottle = getIntersection(line3, line4)
 
-    # display mug height at bottle position
-    cv2.line(img, clicked_points[2], mug_top_on_bottle, (0,0,255), 5)
-    cv2.circle(img, mug_top_on_bottle, 2, (0,255,255), 5)
+    # display mug height at mug and bottle position
+    cv2.line(img, clicked_points[6], mug_top_on_bottle, (0, 0, 255), 5)
+    cv2.line(img, clicked_points[4], clicked_points[5], (0, 0, 255), 5)
+    cv2.circle(img, mug_top_on_bottle, 5, (0, 255, 255), 2)
+    markClickedPoints()
 
     # calculate the mug height at bottle position in pixels
-    mug_height_px = getDistance(mug_top_on_bottle, clicked_points[2])
+    mug_height_px = getDistance(mug_top_on_bottle, clicked_points[6])
     # calculate the bottle height at bottle position in pixels
-    bottle_height_px = getDistance(clicked_points[2], clicked_points[3])
+    bottle_height_px = getDistance(clicked_points[6], clicked_points[7])
     # calculate mug height in centimeters with mug/bottle ratio and known bottle height of 26cm
     mug_height_cm = np.round(((mug_height_px / bottle_height_px) * 26), 2)
     return mug_height_cm
 
+# expand image to show vanishing line
+def expandImage():
+    min_world_x = min(min(vanishing_points)[0], 0)
+    max_world_x = max(max(vanishing_points)[0], width)
+    min_world_y = min(min(vanishing_points, key=lambda x: x[1])[1], 0)
+    max_world_y = max(max(vanishing_points, key=lambda x: x[1])[1], height)
+    border = 50  # pixel border so that vanishing points are fully visible
+    world_width = max_world_x - min_world_x + (border * 2)
+    world_height = max_world_y - min_world_y + (border * 2)
+    world_img = np.zeros((world_height, world_width, 3), np.uint8)
+
+    # get original image region and vanishing points in world_img coordinates
+    # world image is translated about min_world + border
+    origin = (abs(min_world_x) + border, abs(min_world_y) + border)
+    vanishing_point1 = tuple(map(operator.add, vanishing_points[0], origin))
+    vanishing_point2 = tuple(map(operator.add, vanishing_points[1], origin))
+    vanishing_point3 = tuple(map(operator.add, vanishing_points[2], origin))
+    
+    world_img[origin[1]:origin[1]+height, origin[0]:origin[0]+width, :] = img
+    cv2.line(world_img, vanishing_point1, vanishing_point3, (0, 0, 255), 3, cv2.LINE_AA)
+    cv2.circle(world_img, vanishing_point1, 10, (0, 255, 255), -1)
+    cv2.circle(world_img, vanishing_point2, 10, (0, 255, 255), -1)
+    cv2.circle(world_img, vanishing_point3, 10, (0, 255, 255), -1)
+    
+    cv2.imshow(window_name, world_img)
+
 # mark clicked points on top
 def markClickedPoints():
     for i in range(len(clicked_points)):
-        cv2.circle(img, clicked_points[i], 2, (0,255,255), 5)
-
-# clear the clicked points for next step
-def emptyClickedPoints():
-    while len(clicked_points) != 0:
-        clicked_points.pop()
+        cv2.circle(img, clicked_points[i], 5, (0, 255, 255), 2)
 
 global clicked_points
 clicked_points = []
@@ -114,33 +140,47 @@ def click(event, x, y, flags, param):
         clicked_points.append((x,y))
 
         # table corners are marked  
-        if len(vanishing_points) < 2 and len(clicked_points) == 4:
+        if len(clicked_points) == 4:
             # vanishing point 1
-            calculateVanishingPoints(0, 1, 2, 3, (255,0,0))
+            calculateVanishingPoints(0, 1, 2, 3, (255, 0, 0))
             # vanishing point 2
-            calculateVanishingPoints(0, 3, 1, 2, (0,255,0))
+            calculateVanishingPoints(0, 3, 1, 2, (0, 255, 0))
 
             markClickedPoints()
-            emptyClickedPoints()
             print('Mark first the mug and then the bottle height (bottom to top).')
         
         # mug and bottle height are marked
-        if len(vanishing_points) == 2 and len(clicked_points) == 4:
+        if len(clicked_points) == 8:
             mug_height = str(calculateMugHeight()) + 'cm'
 
-            text_pos = (clicked_points[0][0], clicked_points[0][1] + 100)
-            cv2.putText(img, mug_height, text_pos, cv2.FONT_HERSHEY_PLAIN, 5, (0,0,0), 6, cv2.LINE_8)
+            text_pos = (clicked_points[4][0], clicked_points[4][1] + 100)
+            cv2.putText(img, mug_height, text_pos, cv2.FONT_HERSHEY_PLAIN, 5, (0, 0, 0), 6, cv2.LINE_8)
             print('Mug height: ' + mug_height)
+
+            # stop mouse input
             cv2.setMouseCallback(window_name, lambda *args : None)
+
+            expandImage()
+
+            cv2.imwrite('Aufgabe2/result.jpg', img)
             print('Press Q to quit.')
 
-        if len(clicked_points) <= 4:
+        if len(clicked_points) <= 8:
             markClickedPoints()
-        cv2.imshow(window_name, img)
+        if len(vanishing_points) < 3:
+            cv2.imshow(window_name, img)
             
 cv2.setMouseCallback(window_name, click)
 while True:
     # quit
-    if cv2.waitKey(10) == ord('q'):
+    key_press = cv2.waitKey(10)
+    if key_press == ord('q'):
         break 
+    # clear image
+    elif key_press == ord('c'):
+        img = orig_img.copy()
+        clicked_points = []
+        vanishing_points = []
+        cv2.imshow(window_name, img)
+
 cv2.destroyAllWindows()
