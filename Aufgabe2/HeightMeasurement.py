@@ -8,7 +8,7 @@ img = cv2.imread('Aufgabe2/table_bottle_01.jpg', cv2.IMREAD_COLOR)
 cv2.imshow(window_name, img)
 height, width, _ = img.shape
 
-def getIntersectionPosition(line1, line2):
+def getIntersection(line1, line2):
     intersection = np.cross(line1, line2)
     intersection = intersection/intersection[2]
     return (round(intersection[0]), round(intersection[1]))
@@ -53,7 +53,7 @@ def click(event, x, y, flags, param):
 
             line1 = getLine(clicked_points[0], clicked_points[1])
             line2 = getLine(clicked_points[2], clicked_points[3])
-            intersec_pos = getIntersectionPosition(line1, line2)
+            intersec_pos = getIntersection(line1, line2)
             cv2.circle(img, intersec_pos, 10, (0,0,255), 3)
 
             closer_point1 = getCloserPoint(intersec_pos, clicked_points[0], clicked_points[1])
@@ -67,17 +67,21 @@ def click(event, x, y, flags, param):
         if len(vanishing_points) == 2 and len(clicked_points) == 4:
             line1 = getLine(vanishing_points[0], vanishing_points[1])
             line2 = getLine(clicked_points[0], clicked_points[2])
-            intersec_pos = getIntersectionPosition(line1, line2)
+            intersec_pos = getIntersection(line1, line2)
             vanishing_points.append(intersec_pos)
 
             cv2.line(img, clicked_points[0], intersec_pos, (150,75,0), 3)
             cv2.line(img, clicked_points[2], intersec_pos, (150,75,0), 3)
             cv2.line(img, vanishing_points[2], clicked_points[1], (150,75,0), 3)
-        
-        if len(vanishing_points) == 3 and len(clicked_points) == 5:
-            bottle_height = getDistance(clicked_points[2], clicked_points[3])
-            mug_height = getDistance(clicked_points[2], clicked_points[4])
-            mug_height_cm = np.round(((mug_height / bottle_height) * 26), 2)
+
+            line3 = getLine(intersec_pos, clicked_points[1])
+            line4 = getLine(clicked_points[2], clicked_points[3])
+            mug_top_on_bottle = getIntersection(line3, line4)
+            cv2.circle(img, mug_top_on_bottle, 2, (0,255,255), 5)
+            
+            mug_height_px = getDistance(mug_top_on_bottle, clicked_points[2])
+            bottle_height_px = getDistance(clicked_points[2], clicked_points[3])
+            mug_height_cm = np.round(((mug_height_px / bottle_height_px) * 26), 2)
             print(mug_height_cm)
 
         cv2.imshow(window_name, img)
