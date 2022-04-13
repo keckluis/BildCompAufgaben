@@ -73,8 +73,8 @@ def calculateMugHeight():
     intersec_pos = getIntersection(line1, line2)
 
     # draw lines from vanishing line to object bottoms and mug top
-    cv2.line(img, clicked_points[0], intersec_pos, (150,75,0), 3)
-    cv2.line(img, intersec_pos, clicked_points[1], (150,75,0), 3)
+    cv2.line(img, clicked_points[0], intersec_pos, (255,255,255), 3)
+    cv2.line(img, intersec_pos, clicked_points[1], (255,255,255), 3)
 
     # line from vanishing line through mug top
     line3 = getLine(intersec_pos, clicked_points[1])
@@ -93,6 +93,11 @@ def calculateMugHeight():
     mug_height_cm = np.round(((mug_height_px / bottle_height_px) * 26), 2)
     return mug_height_cm
 
+# mark clicked points on top
+def markClickedPoints():
+    for i in range(len(clicked_points)):
+        cv2.circle(img, clicked_points[i], 2, (0,255,255), 5)
+
 # clear the clicked points for next step
 def emptyClickedPoints():
     while len(clicked_points) != 0:
@@ -105,7 +110,6 @@ vanishing_points = []
 def click(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN:
         clicked_points.append((x,y))
-        cv2.circle(img, (x, y), 2, (0,255,255), 5)
 
         # table corners are marked  
         if len(vanishing_points) < 2 and len(clicked_points) == 4:
@@ -113,14 +117,21 @@ def click(event, x, y, flags, param):
             calculateVanishingPoints(0, 1, 2, 3, (255,0,0))
             # vanishing point 2
             calculateVanishingPoints(0, 3, 1, 2, (0,255,0))
+            
+            markClickedPoints()
             emptyClickedPoints()
             print('Mark first the mug and then the bottle height (bottom to top).')
         
         # mug and bottle height are marked
         if len(vanishing_points) == 2 and len(clicked_points) == 4:
-            print('Mug height: ' + str(calculateMugHeight()) + 'cm')
+            mug_height = str(calculateMugHeight()) + 'cm'
+
+            text_pos = (clicked_points[0][0], clicked_points[0][1] + 100)
+            cv2.putText(img, mug_height, text_pos, cv2.FONT_HERSHEY_PLAIN, 5, (0,0,0), 6, cv2.LINE_8)
+            print('Mug height: ' + mug_height + 'cm')
             print('Press Q to quit.')
 
+        markClickedPoints()
         cv2.imshow(window_name, img)
             
 cv2.setMouseCallback(window_name, click)
