@@ -110,42 +110,43 @@ def calculateMugHeight():
     return mug_height_cm
 
 # expand image to show vanishing line
+# based on BC_tutorial_09
 def expandImage():
-    min_world_x = min(min(vanishing_points)[0], 0)
-    max_world_x = max(max(vanishing_points)[0], width)
-    min_world_y = min(min(vanishing_points, key=lambda x: x[1])[1], 0)
-    max_world_y = max(max(vanishing_points, key=lambda x: x[1])[1], height)
+    min_x = min(min(vanishing_points)[0], 0)
+    max_x = max(max(vanishing_points)[0], width)
+    min_y = min(min(vanishing_points, key=lambda x: x[1])[1], 0)
+    max_y = max(max(vanishing_points, key=lambda x: x[1])[1], height)
     border = 50  # pixel border so that vanishing points are fully visible
-    world_width = max_world_x - min_world_x + (border * 2)
-    world_height = max_world_y - min_world_y + (border * 2)
-    world_img = np.zeros((world_height, world_width, 3), np.uint8)
+    expanded_width = max_x - min_x + (border * 2)
+    expanded_height = max_y - min_y + (border * 2)
+    expanded_img = np.zeros((expanded_height, expanded_width, 3), np.uint8)
 
     # get original image region and vanishing points in world_img coordinates
     # world image is translated about min_world + border
-    origin = (abs(min_world_x) + border, abs(min_world_y) + border)
+    origin = (abs(min_x) + border, abs(min_y) + border)
 
     v_points_new = []
     for i in range(len(vanishing_points)):
         v_points_new.append(tuple(map(operator.add, vanishing_points[i], origin)))
 
-    points = []
+    img_points = []
     for i in range(len(close_points)):
-        points.append(tuple(map(operator.add, close_points[i], origin)))
-    points.append(tuple(map(operator.add, clicked_points[4], origin)))
-    points.append(tuple(map(operator.add, clicked_points[5], origin)))
+        img_points.append(tuple(map(operator.add, close_points[i], origin)))
+    img_points.append(tuple(map(operator.add, clicked_points[4], origin)))
+    img_points.append(tuple(map(operator.add, clicked_points[5], origin)))
     
-    world_img[origin[1]:origin[1]+height, origin[0]:origin[0]+width, :] = img
+    expanded_img[origin[1]:origin[1]+height, origin[0]:origin[0]+width, :] = img
 
     # draw vanishing line
-    cv2.line(world_img, v_points_new[0], v_points_new[2], (0, 0, 255), 3)
+    cv2.line(expanded_img, v_points_new[0], v_points_new[2], (0, 0, 255), 3)
 
     # draw lines to vanishing points 
     for i in range(len(v_points_new)):
-        cv2.line(world_img, v_points_new[i], points[i * 2], (255, 255, 255), 3)
-        cv2.line(world_img, v_points_new[i], points[i * 2 + 1], (255, 255, 255), 3)
-        cv2.circle(world_img, v_points_new[i], 10, (0, 255, 255), -1)
+        cv2.line(expanded_img, v_points_new[i], img_points[i * 2], (255, 255, 255), 3)
+        cv2.line(expanded_img, v_points_new[i], img_points[i * 2 + 1], (255, 255, 255), 3)
+        cv2.circle(expanded_img, v_points_new[i], 10, (0, 255, 255), -1)
 
-    return world_img
+    return expanded_img
 
 global clicked_points
 clicked_points = []
