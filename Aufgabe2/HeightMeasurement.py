@@ -3,16 +3,23 @@ import cv2
 import numpy as np
 import operator
 
-# user instruction
-print('Mark the table corners clockwise or counter-clockwise.')
 window_name = 'window'
 window = cv2.namedWindow(window_name, cv2.WINDOW_FREERATIO)
 
 # load the image
 img = cv2.imread('Aufgabe2/table_bottle_01.jpg', cv2.IMREAD_COLOR)
+height, width, _ = img.shape
+
+# user instruction
+instruction1 = '1. Mark the table corners clockwise or counter-clockwise.'
+cv2.putText(img, instruction1, (20, height - 100), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 0), 3, cv2.LINE_8)
+print(instruction1)
+instruction2 = '2. Mark first the mug and then the bottle height (bottom to top).'
+cv2.putText(img, instruction2, (20, height - 50), cv2.FONT_HERSHEY_PLAIN, 3, (0, 0, 0), 3, cv2.LINE_8)
+print(instruction2)
+
 orig_img = img.copy()
 cv2.imshow(window_name, img)
-height, width, _ = img.shape
 
 # returns position of intersection of 2 lines
 def getIntersection(line1, line2):
@@ -159,8 +166,6 @@ def click(event, x, y, flags, param):
             calculateVanishingPoints(0, 1, 2, 3, (255, 0, 0))
             # vanishing point 2
             calculateVanishingPoints(0, 3, 1, 2, (0, 255, 0))
-
-            print('Mark first the mug and then the bottle height (bottom to top).')
         
         # mug and bottle height are marked
         if len(clicked_points) == 8:
