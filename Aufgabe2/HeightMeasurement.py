@@ -196,6 +196,7 @@ while True:
         img = orig_img.copy()
         clicked_points = []
         vanishing_points = []
+        close_points = []
         cv2.imshow(window_name, img)
 
 cv2.destroyAllWindows()
