@@ -20,7 +20,8 @@ def getLine(point1, point2):
 # returns position of intersection of 2 lines
 def getIntersection(line1, line2):
     intersection = np.cross(line1, line2)
-    intersection = intersection/intersection[2]
+    if intersection[2] != 0:
+        intersection = intersection/intersection[2]
     return (round(intersection[0]), round(intersection[1]))
 
 # expand image to show vanishing line
@@ -52,7 +53,7 @@ def expandImage():
 
 
 # https://stackoverflow.com/questions/57535865/extract-vanishing-point-from-lines-with-open-cv
-found_lines = cv2.HoughLines(edges, 0.7, np.pi / 120, 120, min_theta=np.pi / 36, max_theta=np.pi-np.pi / 36)
+found_lines = cv2.HoughLines(edges, 1, np.pi/180, 200)
 lines = []
 for line in found_lines:
     rho, theta = line[0]
@@ -75,17 +76,26 @@ for line in found_lines:
 rising_lines = []
 falling_lines = []
 for line in lines:
-    if (line[0][0] < line[1][0]):
-        rising_lines.append(getLine(line[0], line[1]))
+    if line[0][1] > line[1][1]:
+        rising_lines.append(line)
     else:
-        falling_lines.append(getLine(line[0], line[1]))
+        falling_lines.append(line)
+
+intersections = []
+for i in range(len(rising_lines) - 1):
+    line1 = getLine(rising_lines[i][0], rising_lines[i][1])
+    line2 = getLine(rising_lines[i + 1][0], rising_lines[i + 1][1])
+    intersections.append(getIntersection(line1, line2))
+for i in range(len(falling_lines) - 1):
+    line1 = getLine(falling_lines[i][0], falling_lines[i][1])
+    line2 = getLine(falling_lines[i + 1][0], falling_lines[i + 1][1])
+    intersections.append(getIntersection(line1, line2))
 
 global vanishing_points
 vanishing_points = []
-for i in range(len(rising_lines) - 1):
-    vanishing_points.append(getIntersection(rising_lines[i], rising_lines[i + 1]))
-for i in range(len(falling_lines) - 1):
-    vanishing_points.append(getIntersection(falling_lines[i], falling_lines[i + 1]))
+for intersec in intersections:
+    if np.abs(intersec[0]) < 10_000 and np.abs(intersec[1]) < 10_000:
+        vanishing_points.append(intersec)
 
 img = expandImage()
 
