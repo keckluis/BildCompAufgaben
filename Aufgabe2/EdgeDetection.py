@@ -24,6 +24,13 @@ def getIntersection(line1, line2):
         intersection = intersection/intersection[2]
     return (round(intersection[0]), round(intersection[1]))
 
+# finds intersections from a set of lines
+def collectIntersections(lines):
+    for i in range(len(lines) - 1):
+        line1 = getLine(lines[i][0], lines[i][1])
+        line2 = getLine(lines[i + 1][0], lines[i + 1][1])
+        intersections.append(getIntersection(line1, line2))
+
 # expand image to show vanishing line
 # based on BC_tutorial_09
 def expandImage():
@@ -31,7 +38,7 @@ def expandImage():
     max_x = max(max(vanishing_points)[0], width)
     min_y = min(min(vanishing_points, key=lambda x: x[1])[1], 0)
     max_y = max(max(vanishing_points, key=lambda x: x[1])[1], height)
-    border = 50  # pixel border so that vanishing points are fully visible
+    border = 100  # pixel border so that vanishing points are fully visible
     expanded_width = max_x - min_x + (border * 2)
     expanded_height = max_y - min_y + (border * 2)
     expanded_img = np.zeros((expanded_height, expanded_width, 3), np.uint8)
@@ -45,9 +52,6 @@ def expandImage():
         v_points_new.append(tuple(map(operator.add, vanishing_points[i], origin)))
 
     expanded_img[origin[1]:origin[1]+height, origin[0]:origin[0]+width, :] = img
-
-    # draw vanishing line
-    cv2.line(expanded_img, v_points_new[0], v_points_new[len(v_points_new) - 1], (0, 0, 255), 3)
 
     return expanded_img
 
@@ -68,11 +72,12 @@ for line in found_lines:
     y1 = int(y0 + 10_000 * a)
     x2 = int(x0 - 10_000 * -b)
     y2 = int(y0 - 10_000 * a)
-    cv2.line(img, (x1, y1), (x2, y2), (0, 0, 0), 2)
+    cv2.line(img, (x1, y1), (x2, y2), (255, 255, 255), 2)
     point1 = (x1, y1)
     point2 = (x2, y2)
     lines.append((point1, point2))
 
+# sort lines by falling and rising, so intersections could be vanishing points
 rising_lines = []
 falling_lines = []
 for line in lines:
@@ -81,27 +86,32 @@ for line in lines:
     else:
         falling_lines.append(line)
 
+# find intersections in the line sets
+global intersections
 intersections = []
-for i in range(len(rising_lines) - 1):
-    line1 = getLine(rising_lines[i][0], rising_lines[i][1])
-    line2 = getLine(rising_lines[i + 1][0], rising_lines[i + 1][1])
-    intersections.append(getIntersection(line1, line2))
-for i in range(len(falling_lines) - 1):
-    line1 = getLine(falling_lines[i][0], falling_lines[i][1])
-    line2 = getLine(falling_lines[i + 1][0], falling_lines[i + 1][1])
-    intersections.append(getIntersection(line1, line2))
+collectIntersections(rising_lines)
+collectIntersections(falling_lines)
 
+# remove intersection out of bounds
 global vanishing_points
 vanishing_points = []
 for intersec in intersections:
     if np.abs(intersec[0]) < 10_000 and np.abs(intersec[1]) < 10_000:
         vanishing_points.append(intersec)
-
+        
+# increase image size to fit vanishing points
 img = expandImage()
+
+# draw vanishing points
+for vp in vanishing_points:
+    cv2.circle(img, vp, 3, (0, 0, 255), 2)
 
 cv2.imshow(window_name, img)
 while True:
     key_press = cv2.waitKey(10)
+
+    # quit
     if key_press == ord('q'):
         break 
+
 cv2.destroyAllWindows()

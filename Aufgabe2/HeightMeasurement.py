@@ -110,7 +110,7 @@ def calculateMugHeight():
     return mug_height_cm
 
 # expand image to show vanishing line
-# based on BC_tutorial_09
+# based on BC_tutorial_09.py
 def expandImage():
     min_x = min(min(vanishing_points)[0], 0)
     max_x = max(max(vanishing_points)[0], width)
