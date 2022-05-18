@@ -5,9 +5,9 @@ import cv2
 import numpy as np
 
 # Load images.
-img1 = cv2.imread('Aufgabe3/tsukuba01.jpg', 0)
-img2 = cv2.imread('Aufgabe3/tsukuba02.jpg', 0)
-img3 = cv2.imread('Aufgabe3/tsukuba03.jpg', 0)
+img1 = cv2.imread('Aufgabe3/table_bottle_01.jpg', 0)
+img2 = cv2.imread('Aufgabe3/table_bottle_02.jpg', 0)
+img3 = cv2.imread('Aufgabe3/table_bottle_03.jpg', 0)
 
 title = 'depth map estimation'
 cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
@@ -18,8 +18,8 @@ def findKeypoints(_img1, _img2):
     sift = cv2.SIFT_create()
     kp1, des1 = sift.detectAndCompute(_img1, None)
     kp2, des2 = sift.detectAndCompute(_img2, None)
-    print('Found %d keypoints in the left image.' % len(kp1))
-    print('Found %d keypoints in the right image.' % len(kp2))
+    print('Found ' + str(len(kp1)) + ' keypoints in the left image.')
+    print('Found ' + str(len(kp2)) + ' keypoints in the right image.')
     print('Each SIFT keypoint is described with a %s-d array' % des1.shape[1])
 
     # Visualize the SIFT keypoints.
@@ -79,13 +79,13 @@ def findEpilines(_img1, _img2, _pts1, _pts2, _F):
     # draw its lines on left image.
     lines1 = cv2.computeCorrespondEpilines(_pts2.reshape(-1, 1, 2), 2, _F)
     lines1 = lines1.reshape(-1, 3)
-    img5, img6 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
+    img5 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
 
     # Find epilines corresponding to points in left image (first image) and
     # draw its lines on right image.
     lines2 = cv2.computeCorrespondEpilines(_pts1.reshape(-1, 1, 2), 1, _F)
     lines2 = lines2.reshape(-1, 3)
-    img3, img4 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
+    img3 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
     cv2.imshow(title, np.concatenate((img3, img5), axis=1))
     cv2.waitKey(0)
 
@@ -102,7 +102,7 @@ def drawEpilines(_img1, _img2, _lines, _pts1, _pts2):
         _img1 = cv2.line(_img1, (x0, y0), (x1, y1), color, 1)
         _img1 = cv2.circle(_img1, tuple(pt1), 2, color, -1)
         _img2 = cv2.circle(_img2, tuple(pt2), 2, color, -1)
-    return _img1, _img2
+    return _img1
 
 
 def rectifyImages(_img1, _img2, _pts1, _pts2, _F):
@@ -125,22 +125,26 @@ def rectifyImages(_img1, _img2, _pts1, _pts2, _F):
 def createDepthMap(_img1_rectified, _img2_rectified):
     # Matched block size. It must be an odd number >=1.
     # Normally, it should be somewhere in the 3..11 range.
-    block_size = 3
-    min_disp = -16
-    max_disp = 32
+    block_size = 11
+
     # Maximum disparity minus minimum disparity.
     # The value is always greater than zero.
     # In the current implementation, this parameter must be divisible by 16.
+    min_disp = -128
+    max_disp = 128
+
     num_disp = max_disp - min_disp
     # Margin in percentage by which the best computed cost function value
     # should "win" the second best value to consider the found match correct.
     # Normally, a value within the 5-15 range is good enough.
     uniquenessRatio = 5
+
     # Maximum size of smooth disparity regions to consider their noise
     # speckles and invalidate.
     # Set it to 0 to disable speckle filtering.
     # Otherwise, set it somewhere in the 50-200 range.
-    speckleWindowSize = 100
+    speckleWindowSize = 200
+
     # Maximum disparity variation within each connected component.
     # If you do speckle filtering, set the parameter to a positive value,
     # it will be implicitly multiplied by 16.
@@ -194,13 +198,14 @@ depth_map3 = getDepthMap(img2, img3)
 # Combine depth maps to result.
 depth_map = np.zeros(depth_map1.shape)
 w, h = depth_map1.shape
-for x in range(w):
-    for y in range(h):
+for x in range(w - 1):
+    for y in range(h - 1):
         depth_map[x, y] = (
-            depth_map1[x, y]
-            + depth_map2[x, y]
-            + depth_map3[x, y]
-            ) / 255
+            int(depth_map1[x, y])
+            + int(depth_map2[x, y])
+            + int(depth_map3[x, y])
+            ) / 255 / 3
 
+# Show result.
 cv2.imshow(title, depth_map)
 cv2.waitKey(0)
