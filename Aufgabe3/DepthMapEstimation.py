@@ -5,9 +5,9 @@ import cv2
 import numpy as np
 
 # Load images.
-img1 = cv2.imread('Aufgabe3/table_bottle_01.jpg', 0)
-img2 = cv2.imread('Aufgabe3/table_bottle_02.jpg', 0)
-img3 = cv2.imread('Aufgabe3/table_bottle_03.jpg', 0)
+img1 = cv2.imread('Aufgabe3/dva1.jpg', 0)
+img2 = cv2.imread('Aufgabe3/dva2.jpg', 0)
+img3 = cv2.imread('Aufgabe3/dva3.jpg', 0)
 
 title = 'depth map estimation'
 cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
