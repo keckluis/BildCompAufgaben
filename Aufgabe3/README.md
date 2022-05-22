@@ -1,6 +1,6 @@
 # Aufgabe 3 DepthMap Estimation
 
-## Bedienung: Spacebar zum durchschalten der Schritte
+Bedienung: Spacebar zum durchschalten der Schritte
 
 ## Schritt1: Auffinden und Matchen von  Features im Bild mithilfe SIFT
 Zuerst versuchen wir identische Features in Bild 1 und Bild 2 zu finden. Dazu benutzen wir den SIFT Algorithmus zusammen dem FLANN Matching. 
