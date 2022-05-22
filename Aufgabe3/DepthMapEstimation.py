@@ -4,14 +4,6 @@
 import cv2
 import numpy as np
 
-# Load images.
-img1 = cv2.imread('Aufgabe3/playmobil_horses_02.jpg', 0)
-img2 = cv2.imread('Aufgabe3/playmobil_horses_03.jpg', 0)
-img3 = cv2.imread('Aufgabe3/playmobil_horses_04.jpg', 0)
-
-title = 'depth map estimation'
-cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
-
 
 def findKeypoints(_img1, _img2):
     # Find the keypoints and descriptors using SIFT_create.
@@ -23,12 +15,12 @@ def findKeypoints(_img1, _img2):
     print('Each SIFT keypoint is described with a %s-d array' % des1.shape[1])
 
     # Visualize the SIFT keypoints.
-    imgSift1 = cv2.drawKeypoints(
+    img_sift1 = cv2.drawKeypoints(
         _img1, kp1, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-    imgSift2 = cv2.drawKeypoints(
+    img_sift2 = cv2.drawKeypoints(
         _img2, kp2, None, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    cv2.imshow(title, np.concatenate((imgSift1, imgSift2), axis=1))
+    cv2.imshow(title, np.concatenate((img_sift1, img_sift2), axis=1))
     cv2.waitKey(0)
 
     return kp1, kp2, des1, des2
@@ -79,14 +71,14 @@ def findEpilines(_img1, _img2, _pts1, _pts2, _F):
     # draw its lines on left image.
     lines1 = cv2.computeCorrespondEpilines(_pts2.reshape(-1, 1, 2), 2, _F)
     lines1 = lines1.reshape(-1, 3)
-    img5 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
+    img3 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
 
     # Find epilines corresponding to points in left image (first image) and
     # draw its lines on right image.
     lines2 = cv2.computeCorrespondEpilines(_pts1.reshape(-1, 1, 2), 1, _F)
     lines2 = lines2.reshape(-1, 3)
-    img3 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
-    cv2.imshow(title, np.concatenate((img3, img5), axis=1))
+    img4 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
+    cv2.imshow(title, np.concatenate((img4, img3), axis=1))
     cv2.waitKey(0)
 
 
@@ -106,8 +98,8 @@ def drawEpilines(_img1, _img2, _lines, _pts1, _pts2):
 
 
 def rectifyImages(_img1, _img2, _pts1, _pts2, _F):
-    h1, w1 = img1.shape
-    h2, w2 = img2.shape
+    h1, w1 = _img1.shape
+    h2, w2 = _img2.shape
     _, H1, H2 = cv2.stereoRectifyUncalibrated(
         np.float32(_pts1),
         np.float32(_pts2),
@@ -125,15 +117,15 @@ def rectifyImages(_img1, _img2, _pts1, _pts2, _F):
 def createDepthMap(_img1_rectified, _img2_rectified):
     # Matched block size. It must be an odd number >=1.
     # Normally, it should be somewhere in the 3..11 range.
-    block_size = 11
+    block_size = 7
 
     # Maximum disparity minus minimum disparity.
     # The value is always greater than zero.
     # In the current implementation, this parameter must be divisible by 16.
-    min_disp = -128
+    min_disp = -64
     max_disp = 128
-
     num_disp = max_disp - min_disp
+
     # Margin in percentage by which the best computed cost function value
     # should "win" the second best value to consider the found match correct.
     # Normally, a value within the 5-15 range is good enough.
@@ -149,7 +141,7 @@ def createDepthMap(_img1_rectified, _img2_rectified):
     # If you do speckle filtering, set the parameter to a positive value,
     # it will be implicitly multiplied by 16.
     # Normally, 1 or 2 is good enough.
-    speckleRange = 2
+    speckleRange = 4
     disp12MaxDiff = 0
 
     stereo = cv2.StereoSGBM_create(
@@ -186,9 +178,17 @@ def getDepthMap(_img1, _img2):
     pts1, pts2 = matchKeypoints(kp1, kp2, des1, des2)
     pts1, pts2, F = findFundamentalMatrix(pts1, pts2)
     findEpilines(img1, img2, pts1, pts2, F)
-    img1_rectified, img2_rectified = rectifyImages(img1, img2, pts1, pts2, F)
+    img1_rectified, img2_rectified = rectifyImages(_img1, _img2, pts1, pts2, F)
     return createDepthMap(img1_rectified, img2_rectified)
 
+
+# Load images.
+img1 = cv2.imread('Aufgabe3/dva1_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread('Aufgabe3/dva2_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+img3 = cv2.imread('Aufgabe3/dva3_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+
+title = 'depth map estimation'
+cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
 
 # Create depth maps from all possible combinations of the 3 images.
 depth_map1 = getDepthMap(img1, img2)
@@ -207,5 +207,5 @@ for x in range(w - 1):
             ) / 255 / 3
 
 # Show result.
-cv2.imshow(title, depth_map)
+cv2.imshow('result', depth_map)
 cv2.waitKey(0)
