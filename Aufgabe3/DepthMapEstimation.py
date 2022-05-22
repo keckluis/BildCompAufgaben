@@ -1,13 +1,13 @@
-# Code adapted from
+# Code adapted from:
 # docs.opencv2.org/4.5.5/da/de9/tutorial_py_epipolar_geometry.html
 # www.andreasjakl.com/understand-and-apply-stereo-rectification-for-depth-maps-part-2/
 import cv2
 import numpy as np
 
 # Load images.
-img1 = cv2.imread('Aufgabe3/table_bottle_01.jpg', 0)
-img2 = cv2.imread('Aufgabe3/table_bottle_02.jpg', 0)
-img3 = cv2.imread('Aufgabe3/table_bottle_03.jpg', 0)
+img1 = cv2.imread('Aufgabe3/playmobil_horses_02.jpg', 0)
+img2 = cv2.imread('Aufgabe3/playmobil_horses_03.jpg', 0)
+img3 = cv2.imread('Aufgabe3/playmobil_horses_04.jpg', 0)
 
 title = 'depth map estimation'
 cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
@@ -18,8 +18,8 @@ def findKeypoints(_img1, _img2):
     sift = cv2.SIFT_create()
     kp1, des1 = sift.detectAndCompute(_img1, None)
     kp2, des2 = sift.detectAndCompute(_img2, None)
-    print('Found ' + str(len(kp1)) + ' keypoints in the left image.')
-    print('Found ' + str(len(kp2)) + ' keypoints in the right image.')
+    print('We found %d keypoints in the left image.' % len(kp1))
+    print('We found %d keypoints in the right image.' % len(kp2))
     print('Each SIFT keypoint is described with a %s-d array' % des1.shape[1])
 
     # Visualize the SIFT keypoints.
@@ -48,7 +48,7 @@ def matchKeypoints(_kp1, _kp2, _des1, _des2):
     # Ratio test as per Lowe's paper.
     # Only use matches with a reasonable small distance.
     for i, (m, n) in enumerate(matches):
-        if m.distance < 0.8*n.distance:
+        if m.distance < 0.8 * n.distance:
             matchesMask[i] = [1, 0]
             pts1.append(_kp1[m.queryIdx].pt)
             pts2.append(_kp2[m.trainIdx].pt)
@@ -97,8 +97,8 @@ def drawEpilines(_img1, _img2, _lines, _pts1, _pts2):
     _img2 = cv2.cvtColor(_img2, cv2.COLOR_GRAY2BGR)
     for r, pt1, pt2 in zip(_lines, _pts1, _pts2):
         color = tuple(np.random.randint(0, 255, 3).tolist())
-        x0, y0 = map(int, [0, -r[2]/r[1]])
-        x1, y1 = map(int, [c, -(r[2]+r[0]*c)/r[1]])
+        x0, y0 = map(int, [0, -r[2] / r[1]])
+        x1, y1 = map(int, [c, -(r[2] + r[0] * c) / r[1]])
         _img1 = cv2.line(_img1, (x0, y0), (x1, y1), color, 1)
         _img1 = cv2.circle(_img1, tuple(pt1), 2, color, -1)
         _img2 = cv2.circle(_img2, tuple(pt2), 2, color, -1)
