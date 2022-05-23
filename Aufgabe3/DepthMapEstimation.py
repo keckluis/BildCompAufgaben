@@ -212,7 +212,15 @@ for i in range(len(depth_maps)):
 
 depth_map = depth_map / 3 / 255
 
-# Show result.
+# Show and save result.
 cv2.imshow(title, depth_map)
-cv2.imwrite('Aufgabe3/result.png', depth_map * 255)
+
+depth_map = cv2.normalize(
+    depth_map,
+    depth_map,
+    alpha=255,
+    beta=0,
+    norm_type=cv2.NORM_MINMAX
+)
+cv2.imwrite('Aufgabe3/result.png', depth_map)
 cv2.waitKey(0)
