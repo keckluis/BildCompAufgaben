@@ -129,29 +129,29 @@ def createDepthMap(_img1_rectified, _img2_rectified):
     # Margin in percentage by which the best computed cost function value
     # should "win" the second best value to consider the found match correct.
     # Normally, a value within the 5-15 range is good enough.
-    uniquenessRatio = 5
+    uniqueness_ratio = 5
 
     # Maximum size of smooth disparity regions to consider their noise
     # speckles and invalidate.
     # Set it to 0 to disable speckle filtering.
     # Otherwise, set it somewhere in the 50-200 range.
-    speckleWindowSize = 200
+    speckle_window_size = 200
 
     # Maximum disparity variation within each connected component.
     # If you do speckle filtering, set the parameter to a positive value,
     # it will be implicitly multiplied by 16.
     # Normally, 1 or 2 is good enough.
-    speckleRange = 4
-    disp12MaxDiff = 0
+    speckle_range = 4
+    disp12_max_diff = 0
 
     stereo = cv2.StereoSGBM_create(
         minDisparity=min_disp,
         numDisparities=num_disp,
         blockSize=block_size,
-        uniquenessRatio=uniquenessRatio,
-        speckleWindowSize=speckleWindowSize,
-        speckleRange=speckleRange,
-        disp12MaxDiff=disp12MaxDiff,
+        uniquenessRatio=uniqueness_ratio,
+        speckleWindowSize=speckle_window_size,
+        speckleRange=speckle_range,
+        disp12MaxDiff=disp12_max_diff,
         P1=8 * 1 * block_size * block_size,
         P2=32 * 1 * block_size * block_size,
     )
