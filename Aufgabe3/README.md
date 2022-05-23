@@ -21,5 +21,5 @@ Bei der Rectification (Berichtigung) geht es darum das Bild 2 mittels der Fundam
 ## Schritt 5: Erstellung der Tiefenkarte
 Mit Hilfe der OpenCV-Funktion 'StereoSGBM_create' wird nun eine Tiefenkarte aus den beiden rektifizierten Bilder erstellt. Da in diesem Programm eine Tiefenkarte aus drei Bildern entstehen soll, wird der gesamte Ablauf dreimal wiederholt, wobei jede mögliche Paar-Kombination aus den drei Bildern genutzt wird.
 
-##Schritt 6: Kombinieren der Tiefenkarten
+## Schritt 6: Kombinieren der Tiefenkarten
 Aus den drei Bilderkombinationen sind drei Tiefenkarten entstanden, die nun zusammengeführt werden. Dafür wird der Farbwert eines Pixels aus allen drei Karten addiert und durch drei dividiert, um einen durchschnittlichen Farbwert zu erhalten. 
