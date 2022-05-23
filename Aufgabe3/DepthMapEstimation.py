@@ -71,14 +71,14 @@ def findEpilines(_img1, _img2, _pts1, _pts2, _F):
     # draw its lines on left image.
     lines1 = cv2.computeCorrespondEpilines(_pts2.reshape(-1, 1, 2), 2, _F)
     lines1 = lines1.reshape(-1, 3)
-    img3 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
+    e_lines1 = drawEpilines(_img1, _img2, lines1, _pts1, _pts2)
 
     # Find epilines corresponding to points in left image (first image) and
     # draw its lines on right image.
     lines2 = cv2.computeCorrespondEpilines(_pts1.reshape(-1, 1, 2), 1, _F)
     lines2 = lines2.reshape(-1, 3)
-    img4 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
-    cv2.imshow(title, np.concatenate((img4, img3), axis=1))
+    e_lines2 = drawEpilines(_img2, _img1, lines2, _pts2, _pts1)
+    cv2.imshow(title, np.concatenate((e_lines2, e_lines1), axis=1))
     cv2.waitKey(0)
 
 
@@ -117,7 +117,7 @@ def rectifyImages(_img1, _img2, _pts1, _pts2, _F):
 def createDepthMap(_img1_rectified, _img2_rectified):
     # Matched block size. It must be an odd number >=1.
     # Normally, it should be somewhere in the 3..11 range.
-    block_size = 7
+    block_size = 11
 
     # Maximum disparity minus minimum disparity.
     # The value is always greater than zero.
@@ -183,29 +183,36 @@ def getDepthMap(_img1, _img2):
 
 
 # Load images.
-img1 = cv2.imread('Aufgabe3/dva1_half_res.jpg', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('Aufgabe3/dva2_half_res.jpg', cv2.IMREAD_GRAYSCALE)
-img3 = cv2.imread('Aufgabe3/dva3_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+img1 = cv2.imread('Aufgabe3/img/dva1_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+img2 = cv2.imread('Aufgabe3/img/dva2_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+img3 = cv2.imread('Aufgabe3/img/dva3_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+# img4 = cv2.imread('Aufgabe3/img/dva4_half_res.jpg', cv2.IMREAD_GRAYSCALE)
+# img5 = cv2.imread('Aufgabe3/img/dva5_half_res.jpg', cv2.IMREAD_GRAYSCALE)
 
 title = 'depth map estimation'
 cv2.namedWindow(title, cv2.WINDOW_GUI_NORMAL)
 
+depth_maps = []
 # Create depth maps from all possible combinations of the 3 images.
-depth_map1 = getDepthMap(img1, img2)
-depth_map2 = getDepthMap(img1, img3)
-depth_map3 = getDepthMap(img2, img3)
+depth_maps.append(getDepthMap(img1, img2))
+depth_maps.append(getDepthMap(img1, img3))
+depth_maps.append(getDepthMap(img2, img3))
+
+# Use img1 and create depth maps with the other 4 images.
+# depth_maps.append(getDepthMap(img1, img2))
+# depth_maps.append(getDepthMap(img1, img3))
+# depth_maps.append(getDepthMap(img1, img4))
+# depth_maps.append(getDepthMap(img1, img5))
 
 # Combine depth maps to result.
-depth_map = np.zeros(depth_map1.shape)
-w, h = depth_map1.shape
-for x in range(w - 1):
-    for y in range(h - 1):
-        depth_map[x, y] = (
-            int(depth_map1[x, y])
-            + int(depth_map2[x, y])
-            + int(depth_map3[x, y])
-            ) / 255 / 3
+depth_map = np.zeros(depth_maps[0].shape)
+
+for i in range(len(depth_maps)):
+    depth_map += depth_maps[i]
+
+depth_map = depth_map / 3 / 255
 
 # Show result.
-cv2.imshow('result', depth_map)
+cv2.imshow(title, depth_map)
+cv2.imwrite('Aufgabe3/result.png', depth_map * 255)
 cv2.waitKey(0)
