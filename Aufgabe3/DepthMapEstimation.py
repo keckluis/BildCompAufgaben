@@ -210,7 +210,7 @@ depth_map = np.zeros(depth_maps[0].shape)
 for i in range(len(depth_maps)):
     depth_map += depth_maps[i]
 
-depth_map = depth_map / 3 / 255
+depth_map = depth_map / len(depth_maps) / 255
 
 # Show and save result.
 cv2.imshow(title, depth_map)
