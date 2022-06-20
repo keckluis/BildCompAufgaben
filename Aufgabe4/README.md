@@ -27,17 +27,17 @@ Dieser Befehl startet einen mkv-Reader, der die einmzelnen Frames aus der Videod
 ## Make fragments
 `python run_system.py "outputfolder\\config.json" --make`
   
-Der erste Schritt erstellt Fragmente durch Kombination der RGBD-Daten aus den einzelnen Frames.
+Der erste Schritt erstellt Fragmente (Geometrie) durch Kombination der RGBD-Daten aus den einzelnen Frames. Für diesen Schritt kommen verschiedene Algorithmen zum Einsatz. Dazu zählt "RGBD Odometry", welche die Kamerabewegungen zuwischen 2 Frames berechnet, die "Multiway Registration" welche zum Ziel hat die die Geometrien im Globalen Koordinatensystem anzuordnen, und RGBD Integration.
   
 ## Register fragments
 `python run_system.py "outputfolder\\config.json" --register`
   
-Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen. Dafür werden zunächst Fragmente paarweise grob ausgerichtet (RANSAC oder Fast global registration). Darauf folgt eine Multiway registration.
+Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen. HieR kommt Iterative Closest Point (ICP) Registration und Multiway Registration zum Einsatz.
   
 ## Refine registration
 `python run_system.py "outputfolder\\config.json" --refine`
   
-In Schritt drei wird die Anordnung der Fragmente weiter verfeinert.
+In Schritt drei wird die Anordnung der Fragmente weiter verfeinert. Dazu werden mittels ICP Punktewolken  aus verschiedenen Bildern weiter aneinander angenähert. Multiway Registation kommt auch wieder zum Einsatz.
   
 ## Integrate scene
 `python run_system.py "outputfolder\\config.json" --integrate`
