@@ -22,7 +22,7 @@ Der eigentliche Rekonstruktions-Code ist von Open und kann [hier](https://github
 `azure_kinect_mkv_reader.py --input input.mkv --output outputfolder`
   
 Dieser Befehl startet einen mkv-Reader, der die einmzelnen Frames aus der Videodatei extrahiert und in einem Ordner speichert. In einem anderen Ordner werden außerdem Tiefenkarten gespeichert, die aus den in der mvk-Datei vorhandenen Tiefeninformationen erstellt werden.
-![mkv_reader](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/mkv_reader.png)
+![mkv_reader](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/readme_images/mkv_reader.png)
 
 ## Make fragments
 `python run_system.py "outputfolder\\config.json" --make`
@@ -38,4 +38,4 @@ Der erste Schritt
 `python run_system.py "outputfolder\\config.json" --integrate`
   
 ## Result
-![result](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/result.png)
+![result](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/readme_images/result.png)
