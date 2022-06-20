@@ -32,12 +32,12 @@ Der erste Schritt erstellt Fragmente (Geometrie) durch Kombination der RGBD-Date
 ## Register fragments
 `python run_system.py "outputfolder\\config.json" --register`
   
-Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen. HieR kommt Iterative Closest Point (ICP) Registration und Multiway Registration zum Einsatz.
+Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen. Hier kommt Iterative Closest Point (ICP) Registration und Multiway Registration zum Einsatz.
   
 ## Refine registration
 `python run_system.py "outputfolder\\config.json" --refine`
   
-In Schritt drei wird die Anordnung der Fragmente weiter verfeinert. Dazu werden mittels ICP Punktewolken  aus verschiedenen Bildern weiter aneinander angenähert. Multiway Registation kommt auch wieder zum Einsatz.
+In Schritt drei wird die Anordnung der Fragmente weiter verfeinert. Dazu werden mittels ICP Registration, Punktewolken aus verschiedenen Bildern weiter angeglichen. Multiway Registation kommt auch wieder zum Einsatz. Es empfiehlt sich diesen Schritt ein paar mal zu wiederholen.
   
 ## Integrate scene
 `python run_system.py "outputfolder\\config.json" --integrate`
