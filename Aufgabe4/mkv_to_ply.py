@@ -8,6 +8,7 @@ target = input("result folder name: ")
 
 # refining iterations
 iterations = input("number of refining iteration: ")
+iterations = int(iterations)
 
 path = "open3d\\examples\\reconstruction_system\\"
 
@@ -21,4 +22,5 @@ os.system(reconstruction_command + " --register")
 
 for i in range(iterations):
     os.system(reconstruction_command + " --refine")
+    
 os.system(reconstruction_command + " --integrate")
