@@ -14,17 +14,26 @@ Sobald Open3D installiert ist wird außerdem der Code aus dem Open3D-Repository 
 Der Pfad zu diesem lässt sich im Terminal mit dem Befehl "pip show open3d" anzeigen.  
 Am besten kopiert man jetzt den Ordner "open3d" und fügt ihn zusammen mit dem Skript "mkv_to_ply.py" und der mkv-Datei in einen neuen Ordner.
 Dort kann man nun das Skript starten und wird im Terminal aufgefordert den Namen der mkv-Datei (mit Dateiendung) einzugeben. Nach der Bestätigung wird noch nach einem Namen für den Ordner gefragt in dem die Ergebnisse gespeichert werden sollen.
+  
+Disclaimer: Das Skript dient nur der Zusammenfassung mehrerer Konsolenbefehle, die man für die 3D Rekonstruktion mit Open3D einzeln ausführen müsste.
+Der eigentliche Rekonstruktions-Code ist von Open und kann [hier](https://github.com/isl-org/Open3D) gefunden werden.
 
 ## .mvk Reader
+`azure_kinect_mkv_reader.py --input input.mkv --output outputfolder`
+  
 ![mkv_reader](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/mkv_reader.png)
 
 ## Make fragments
-
+`python run_system.py "outputfolder\\config.json" --make`
+  
 ## Register fragments
-
+`python run_system.py "outputfolder\\config.json" --register`
+  
 ## Refine registration
-
+`python run_system.py "outputfolder\\config.json" --refine`
+  
 ## Integrate scene
-
+`python run_system.py "outputfolder\\config.json" --integrate`
+  
 ## Result
 ![result](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/result.png)
