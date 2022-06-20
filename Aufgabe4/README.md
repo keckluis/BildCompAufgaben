@@ -32,7 +32,7 @@ Der erste Schritt erstellt Fragmente durch Kombination der RGBD-Daten aus den ei
 ## Register fragments
 `python run_system.py "outputfolder\\config.json" --register`
   
-Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen.
+Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen. Dafür werden zunächst Fragmente paarweise grob ausgerichtet (RANSAC oder Fast global registration). Darauf folgt eine Multiway registration.
   
 ## Refine registration
 `python run_system.py "outputfolder\\config.json" --refine`
