@@ -1,6 +1,4 @@
-# Aufgabe 4 3D Reconstruction
-
-Bedienung: Beliebige Taste zum durchschalten der Schritte  
+# Aufgabe 4 3D Reconstruction  
 
 Python-Version: 3.9.13  
   
