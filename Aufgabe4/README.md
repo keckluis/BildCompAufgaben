@@ -27,15 +27,22 @@ Dieser Befehl startet einen mkv-Reader, der die einmzelnen Frames aus der Videod
 ## Make fragments
 `python run_system.py "outputfolder\\config.json" --make`
   
-Der erste Schritt 
+Der erste Schritt erstellt Fragmente durch Kombination der RGBD-Daten aus den einzelnen Frames.
+  
 ## Register fragments
 `python run_system.py "outputfolder\\config.json" --register`
+  
+Im zweiten Schritt werden die einzelnen Fragmente neu ausgerichtet, damit sie die passende Transformation im globalen Raum einnehmen.
   
 ## Refine registration
 `python run_system.py "outputfolder\\config.json" --refine`
   
+In Schritt drei wird die Anordnung der Fragmente weiter verfeinert.
+  
 ## Integrate scene
 `python run_system.py "outputfolder\\config.json" --integrate`
+  
+Im letzten Schritt werden die einzelnen, nun ausgerichteten Fragmente in ein gemeinsames Volume zusammengeführt und als ply-Datei exportiert.
   
 ## Result
 ![result](https://github.com/keckluis/BildCompAufgaben/blob/main/Aufgabe4/readme_images/result.png)
