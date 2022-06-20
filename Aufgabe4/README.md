@@ -4,7 +4,7 @@ Bedienung: Beliebige Taste zum durchschalten der Schritte
 
 Python-Version: 3.9.13  
   
-Package-Versionen
+Package-Versionen  
 open3d: 0.15.1   
 numpy: 1.22.4  
 opencv-python: 4.6.0.66  
