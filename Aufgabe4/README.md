@@ -16,7 +16,7 @@ Am besten kopiert man jetzt den Ordner "open3d" und fügt ihn zusammen mit dem S
 Dort kann man nun das Skript starten und wird im Terminal aufgefordert den Namen der mkv-Datei (mit Dateiendung) einzugeben. Nach der Bestätigung wird noch nach einem Namen für den Ordner gefragt in dem die Ergebnisse gespeichert werden sollen. Das Skript startet dann den Prozess und verarbeitet die Daten aus der mkv-Datei um ein 3D-Modell im ply-Format zu rekonstruieren. Dieses ist dann im Unterordner "scene" unter dem Namen "integrated.ply" zu finden.
   
 Disclaimer: Das Skript dient nur der Zusammenfassung mehrerer Konsolenbefehle, die man für die 3D Rekonstruktion mit Open3D einzeln ausführen müsste.
-Der eigentliche Rekonstruktions-Code ist von Open und kann [hier](https://github.com/isl-org/Open3D) gefunden werden.
+Der eigentliche Rekonstruktions-Code ist von Open3D und kann [hier](https://github.com/isl-org/Open3D) gefunden werden.
 
 ## .mvk Reader
 `azure_kinect_mkv_reader.py --input input.mkv --output outputfolder`
